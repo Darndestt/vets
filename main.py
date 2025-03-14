@@ -97,7 +97,17 @@ bot = commands.Bot(command_prefix=".", intents=intents)
 
 @bot.event
 async def on_message(message):
+    global jogo_ativo
+    
     if message.author == bot.user:
+        return
+
+    if jogo_ativo and (message.content.startswith(".ver") or message.content.startswith(".comandos")):
+        await message.channel.send(embed=discord.Embed(
+            title="🚫 Comando Bloqueado",
+            description="Este comando não pode ser usado durante a partida.",
+            color=discord.Color.red()
+        ))
         return
 
     imagens = obter_imagens()
