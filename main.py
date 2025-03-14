@@ -452,12 +452,12 @@ async def perfil(ctx):
         insignia_descricao = "Parabéns! Você acumulou mais de **50.000 pontos** e conquistou esta insígnia!"
     else:
         insignia = "⚪ Ainda não conquistada"
-        insignia_descricao = "Acumule **50.000 pontos** para desbloquear esta insígnia! 🎯"
+        insignia_descricao = "Acumule **50.000 pontos** para desbloquear esta insígnia!"
 
     embed = discord.Embed(
-        title=f"Perfil de {usuario.name}",
+        title=f"Perfil de {usuario.mention}",
         description=f"🎯 **Total de pontos acumulados:** `{pontos_usuario}`",
-        color=discord.Color.blue()
+        color=discord.Color.random()
     )
     
     if usuario.avatar:
@@ -479,6 +479,7 @@ async def comandos(ctx):
     embed.add_field(name=".fim", value="Encerra a partida atual e exibe o vencedor.", inline=False)
     embed.add_field(name=".ver <nome>", value="Exibe a imagem do desenho correspondente ao nome fornecido.", inline=False)
     embed.add_field(name=".ver lista", value="Exibe uma lista de palavras disponíveis.", inline=False)
+    embed.add_field(name=".perfil", value="Exibe informações sobre o perfil do usuário.", inline=False)
     embed.add_field(name=".comandos", value="Exibe este menu de comandos.", inline=False)
 
     await ctx.send(embed=embed)
