@@ -455,7 +455,7 @@ async def perfil(ctx):
         insignia_descricao = "Acumule **50.000 pontos** para desbloquear esta insígnia!"
 
     embed = discord.Embed(
-        title=f"Perfil de {usuario.mention}",
+        title=f"Perfil de {usuario.name}",
         description=f"🎯 **Total de pontos acumulados:** `{pontos_usuario}`",
         color=discord.Color.random()
     )
