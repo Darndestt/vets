@@ -282,11 +282,11 @@ async def play(ctx):
 
             if msg.author not in pontos:
                 pontos[msg.author] = 0
-                pontos[msg.author] += 2
-
+            pontos[msg.author] += 2
+            
             if msg.author not in pontuacao_total:
                 pontuacao_total[msg.author] = 0
-                pontuacao_total[msg.author] += 2
+            pontuacao_total[msg.author] += 2
 
             await ctx.send(embed=discord.Embed(
                 title="✅ Resposta Correta",
