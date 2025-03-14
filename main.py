@@ -23,6 +23,7 @@ ermitir_pausa = False
 pausa_anunciada = False
 resposta_correta = None
 pontos = {}
+pontuacao_total = {}
 erros = 0
 jogador_iniciador = None
 
@@ -98,11 +99,11 @@ bot = commands.Bot(command_prefix=".", intents=intents)
 @bot.event
 async def on_message(message):
     global jogo_ativo
-    
+
     if message.author == bot.user:
         return
-
-    if jogo_ativo and (message.content.startswith(".ver")):
+    
+    if jogo_ativo and (message.content.startswith(".ver") or message.content.startswith(".comandos")):
         await message.channel.send(embed=discord.Embed(
             title="🚫 Comando Bloqueado",
             description="Este comando não pode ser usado durante a partida.",
@@ -201,7 +202,7 @@ async def on_message(message):
 
 @bot.command()
 async def play(ctx):
-    global jogo_ativo, pausado, resposta_correta, pontos, erros, jogador_iniciador, permitir_pausa
+    global jogo_ativo, pausado, resposta_correta, pontos, pontuacao_total, erros, jogador_iniciador, permitir_pausa
 
     if jogo_ativo:
         await ctx.send(embed=discord.Embed(
@@ -281,7 +282,11 @@ async def play(ctx):
 
             if msg.author not in pontos:
                 pontos[msg.author] = 0
-            pontos[msg.author] += 2
+                pontos[msg.author] += 2
+
+            if msg.author not in pontuacao_total:
+                pontuacao_total[msg.author] = 0
+                pontuacao_total[msg.author] += 2
 
             await ctx.send(embed=discord.Embed(
                 title="✅ Resposta Correta",
@@ -436,6 +441,31 @@ async def fim(ctx):
         description="A partida foi encerrada.",
         color=discord.Color.red()
     ))
+
+@bot.command()
+async def perfil(ctx):
+    usuario = ctx.author
+    
+    pontos_usuario = pontuacao_total.get(usuario, 0)
+    if pontos_usuario >= 50000:
+        insignia = "🍓 Conquistada!"
+        insignia_descricao = "Parabéns! Você acumulou mais de **50.000 pontos** e conquistou esta insígnia!"
+    else:
+        insignia = "⚪ Ainda não conquistada"
+        insignia_descricao = "Acumule **50.000 pontos** para desbloquear esta insígnia! 🎯"
+
+    embed = discord.Embed(
+        title=f"Perfil de {usuario.name}",
+        description=f"🎯 **Total de pontos acumulados:** `{pontos_usuario}`",
+        color=discord.Color.blue()
+    )
+    
+    if usuario.avatar:
+        embed.set_thumbnail(url=usuario.avatar.url)
+
+    embed.add_field(name="🏅 Insígnia Especial", value=f"{insignia}\n{insignia_descricao}", inline=False)
+
+    await ctx.send(embed=embed)
 
 @bot.command()
 async def comandos(ctx):
