@@ -102,7 +102,7 @@ async def on_message(message):
     if message.author == bot.user:
         return
 
-    if jogo_ativo and (message.content.startswith(".ver") or message.content.startswith(".comandos")):
+    if jogo_ativo and (message.content.startswith(".ver")):
         await message.channel.send(embed=discord.Embed(
             title="🚫 Comando Bloqueado",
             description="Este comando não pode ser usado durante a partida.",
