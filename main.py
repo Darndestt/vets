@@ -18,8 +18,9 @@ REPO_URL = "https://api.github.com/repos/Darndestt/vets/contents/vetali"
 CACHE_FILE = "cache.json"
 
 jogo_ativo = False
+tempo_intervalo = 10
 pausado = False
-ermitir_pausa = False
+permitir_pausa = False
 pausa_anunciada = False
 resposta_correta = None
 pontos = {}
@@ -202,7 +203,7 @@ async def on_message(message):
 
 @bot.command()
 async def play(ctx):
-    global jogo_ativo, pausado, resposta_correta, pontos, pontuacao_total, erros, jogador_iniciador, permitir_pausa
+    global jogo_ativo, pausado, resposta_correta, pontos, pontuacao_total, erros, jogador_iniciador, permitir_pausa, tempo_intervalo
 
     if jogo_ativo:
         await ctx.send(embed=discord.Embed(
@@ -236,8 +237,13 @@ async def play(ctx):
             pausa_anunciada = True
         await asyncio.sleep(1)
 
-    if pausado:
-        await verificar_timeout_pausa(ctx)
+    while tempo_intervalo > 0:
+        if pausado:
+            await asyncio.sleep(1)
+            continue
+
+        await asyncio.sleep(1)
+        tempo_intervalo -= 1
 
     imagens = obter_imagens()
     if not imagens:
@@ -282,11 +288,11 @@ async def play(ctx):
 
             if msg.author not in pontos:
                 pontos[msg.author] = 0
-            pontos[msg.author] += 2
-            
+                pontos[msg.author] += 2
+
             if msg.author not in pontuacao_total:
                 pontuacao_total[msg.author] = 0
-            pontuacao_total[msg.author] += 2
+                pontuacao_total[msg.author] += 2
 
             await ctx.send(embed=discord.Embed(
                 title="✅ Resposta Correta",
@@ -302,8 +308,8 @@ async def play(ctx):
             ))
 
             for player in pontos:
-                    if pontos.get(player) is None:
-                        pontos[player] = 0
+                if pontos.get(player) is None:
+                    pontos[player] = 0
 
         await ctx.send(embed=discord.Embed(
             title="📊 Pontuação Atual",
@@ -337,7 +343,15 @@ async def play(ctx):
         ))
 
         permitir_pausa = True
-        await asyncio.sleep(10)
+        tempo_intervalo = 10
+
+        while tempo_intervalo > 0:
+            if pausado:
+                await asyncio.sleep(1)
+                continue
+
+            await asyncio.sleep(1)
+            tempo_intervalo -= 1
 
 @bot.command()
 async def pausar(ctx):
@@ -455,7 +469,7 @@ async def perfil(ctx):
         insignia_descricao = "Acumule **50.000 pontos** para desbloquear esta insígnia!"
 
     embed = discord.Embed(
-        title=f"Perfil de {usuario.name}",
+        title=f"Perfil de {usuario.mention}",
         description=f"🎯 **Total de pontos acumulados:** `{pontos_usuario}`",
         color=discord.Color.random()
     )
@@ -479,9 +493,9 @@ async def comandos(ctx):
     embed.add_field(name=".fim", value="Encerra a partida atual e exibe o vencedor.", inline=False)
     embed.add_field(name=".ver <nome>", value="Exibe a imagem do desenho correspondente ao nome fornecido.", inline=False)
     embed.add_field(name=".ver lista", value="Exibe uma lista de palavras disponíveis.", inline=False)
-    embed.add_field(name=".perfil", value="Exibe informações sobre o perfil do usuário.", inline=False)
     embed.add_field(name=".comandos", value="Exibe este menu de comandos.", inline=False)
 
     await ctx.send(embed=embed)
 
 bot.run(TOKEN)
+
