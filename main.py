@@ -22,6 +22,7 @@ tempo_intervalo = 10
 pausado = False
 permitir_pausa = False
 pausa_anunciada = False
+pausa_task = None
 resposta_correta = None
 pontos = {}
 pontuacao_total = {}
@@ -355,7 +356,7 @@ async def play(ctx):
 
 @bot.command()
 async def pausar(ctx):
-    global pausado, jogo_ativo, pausa_anunciada, permitir_pausa
+    global pausado, jogo_ativo, pausa_anunciada, permitir_pausa, pausa_task
     
     if not jogo_ativo:
         await ctx.send(embed=discord.Embed(
@@ -384,6 +385,11 @@ async def pausar(ctx):
     if pausado:
         pausado = False
         pausa_anunciada = False
+
+        if pausa_task is not None:
+            pausa_task.cancel()
+            pausa_task = None 
+        
         await ctx.send(embed=discord.Embed(
             title="▶️ Jogo Retomado",
             description="A partida foi retomada.",
@@ -396,15 +402,17 @@ async def pausar(ctx):
             description="O jogo foi pausado. Digite `.pausar` para retomar.",
             color=discord.Color.orange()
         ))
-        asyncio.create_task(verificar_timeout_pausa(ctx))
+
+        pausa_task = asyncio.create_task(verificar_timeout_pausa(ctx))
 
 async def verificar_timeout_pausa(ctx):
-    global pausado, jogo_ativo
+    global pausado, jogo_ativo, pausa_task
     
     await asyncio.sleep(60)
     
     if pausado:
         pausado = False
+        pausa_task = None
         await ctx.send(embed=discord.Embed(
             title="⏩ Jogo Retomado Automaticamente",
             description="O jogo foi retomado automaticamente após 1 minuto de pausa.",
